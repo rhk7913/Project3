@@ -51,8 +51,31 @@ lwc1 $f7, 20($sp)   # $f7: a31
 lwc1 $f8, 16($sp)   # $f8: a32
 lwc1 $f9, 12($sp)   # $f9: a33
 lwc1 $f10, 8($sp)   # $f10: b1
-lwc1 $f11, 4($sp)   # $f11: b2
+lwc1 $f11, 4($sp)    # $f11: b2
 lwc1 $f12, 0($sp)   # $f12: b3
 j $ra
 
 systemSolve:
+# Multiply each fp register with the given coefficient
+# Check if coefficient = 0
+beq $f1, 0, exit # check for all coefficients 
+
+# If the coefficients match, subtract the registers
+beq $f1, $f4, subfunctions
+beq $f2, $f5, subfunctions
+beq $f3, $f6, subfunctions
+
+# If the coefficients don't match, multiply the coefficients
+bne $f1, $f4, multcoeff
+bne $f2, $f5, multcoeff
+bne $f3, $f6, multcoeff
+
+subfunctions: 
+sub $f13, $f1, $f4
+sub $f14, $f2, $f5
+sub $f15, $f3, $f6
+
+multcoeff:
+mul $f13, $f1, $f4
+mul $f14, $f2, $f5
+mul $f15, $f3, $f6
