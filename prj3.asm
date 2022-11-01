@@ -51,7 +51,7 @@ lwc1 $f7, 20($sp)   # $f7: a31
 lwc1 $f8, 16($sp)   # $f8: a32
 lwc1 $f9, 12($sp)   # $f9: a33
 lwc1 $f10, 8($sp)   # $f10: b1
-lwc1 $f11, 4($sp)    # $f11: b2
+lwc1 $f11, 4($sp)   # $f11: b2
 lwc1 $f12, 0($sp)   # $f12: b3
 j $ra
 
