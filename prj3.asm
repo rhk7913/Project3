@@ -119,6 +119,7 @@ syscall
 li $v0, 4
 la $a0, newline
 syscall
+j exit
 
 printNoSolution:
 li $v0, 4
@@ -128,59 +129,34 @@ la $a0, newline
 syscall
 
 handleInput:
-addiu $sp, $sp, -96 # make room for 24 numbers on stack
-li $v0, 6           # read float
-syscall             # 8 byte difference b/c in btwn FP numbers will be temp INTs
-swc1 $f0, 92($sp)   # a11
-syscall
-swc1 $f0, 84($sp)   # a12
-syscall
-swc1 $f0, 76($sp)   # a13
-syscall
-swc1 $f0, 68($sp)   # a21
-syscall
-swc1 $f0, 60($sp)   # a22
-syscall
-swc1 $f0, 52($sp)   # a23
-syscall
-swc1 $f0, 44($sp)   # a31
-syscall
-swc1 $f0, 36($sp)   # a32
-syscall
-swc1 $f0, 28($sp)   # a33
-syscall
-swc1 $f0, 20($sp)   # b1
-syscall
-swc1 $f0, 12($sp)   # b2
-syscall
-swc1 $f0, 4($sp)    # b3
-
+# storing FP inputs in every other address of stack
 # checking for 0's while loading
-# setting the word following the address of the FP num 0 if $fx == 0, 1 otherwise
+# setting the word following the address of each FP num to 0 if $fx == 0.0, 1 otherwise
+addiu $sp, $sp, -96         # make room for 24 numbers on stack
+li $v0, 6                   # read float
 li $t1, 1
 li.s $f25, 0.0
-
 la $t2, 96                  # $t2: offset
 add $t0, $sp, $t2           # $t0: offset($sp-96)
-loop:
-addi $t2, $t2, -4           # $t2: offset - 4    
+syscallLoop:
+ble $t2, $zero, loadVals    # if offset < 0, exit loop
+addi $t2, $t2, -4           # $t2: offset - 4
 add $t0, $sp, $t2           # $t0: addr of FP num ($fx)
-lwc1 $f26, 0($t0)           # $f26: current FP num ($fx)
-c.eq.s $f26, $f25           # c = 1 if $fx == 0.0
+syscall
+swc1 $f0, 0($t0)            # store FP num in offset($sp-96)
+c.eq.s $f0, $f25            # c = 1 if $fx == 0.0
 addi $t2, $t2, -4           # $t2: offset - 4 
-add $t0, $sp, $t2           # $t0: addr of corresponding temp int ($tx)
-slti $t3, $t2, 0            # $t3: 1 if offset < 0
-beq $t3, $t2, loadVals      # if x < 0 for $t0 == x($sp), exit loop
-bc1t store0                 # store 0 in $tx if $fx == 0
-bc1f store1                 # store 1 in $tx if $fx != 0
+add $t0, $sp, $t2           # $t0: addr of corresponding int
+bc1t store0                 # store 0 in following addr if $fx == 0
+bc1f store1                 # store 1 in following addr if $fx != 0
 
 store0:
 sw $zero, 0($t0)
-j loop
+j syscallLoop
 
 store1:
 sw $t1, 0($t0)
-j loop
+j syscallLoop
 
 loadVals:
 lwc1 $f1, 92($sp)   # $f1: a11; 88($sp): 0/1 for a11 == 0 or != 0
@@ -198,5 +174,4 @@ lwc1 $f12, 4($sp)   # $f12: b3;  0($sp): 0/1
 
 j $ra
 
-
-
+exit:
