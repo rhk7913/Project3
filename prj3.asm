@@ -14,13 +14,30 @@ main:
 jal handleInput
 
 # need to check if coefficients == 0
-# if an eq has three 0's -> no solution
+# if an eq has three 0's -> 
 # if an eq has two 0's -> forward it to the 1 - 1 var equation code
 # if an eq has one 0 -> forward it to the 2 - 2 var equations code
+
+# li $t5, 1
+# li $t6, 2
+# li $t7, 3
+
+# lw $t1, 88($sp)
+# lw $t2, 80($sp)
+# lw $t3, 72($sp)
+# add $t4, $t1, $t2
+# add $t4, $t4, $t3
+# blt $t4, $t5, prepEq1forThree3x3  # if # of 0's == 0
+# blt $t4, $t6, prepEq1forTwo2x2    # if # of 0's == 1
+# blt $t4, $t7, prepEq1forOne1x1    # if # of 0's == 2
+
 
 # need to check if equations have no solution
 # need to make regular checks to see if the elimination process eliminates more than one var
 # (more than 1 0 coef is created)
+
+# prepEq1forThree3x3:
+
 
 three3x3:
 # 3 - 3 var equations, assuming no 0's
@@ -43,7 +60,6 @@ add.s $f15, $f6, $f3
 add.s $f16, $f11, $f10  # f14y + f15z = f16
 # check for 0's in f14 and f15
 
-
 # getting 3rd equation ready to subtract from 2nd
 div.s $f13, $f4, $f7
 mul.s $f13, $f13, $f0   # $f13: const to mult with all coefs
@@ -57,6 +73,9 @@ add.s $f17, $f5, $f8
 add.s $f18, $f6, $f9
 add.s $f19, $f11, $f12  # f17y + f18z = f19
 # check for 0's in f17 and f18
+
+# prepEq1forTwo2x2:
+
 
 two2x2:
 # 2 - 2 var equations, assuming no 0's
@@ -74,6 +93,9 @@ mul.s $f16, $f16, $f13  # $f16: ready to subtract from f19
 add.s $f20, $f15, $f18
 add.s $f21, $f16, $f19  # f20z = f21
 # check for 0 in f20
+
+# prepEq1forOne1x1:
+
 
 one1x1:
 # 1 - 1 var equation, assuming no 0's (solve for z then plug in for y and x)
@@ -127,6 +149,7 @@ la $a0, noSol
 syscall
 la $a0, newline
 syscall
+j exit
 
 handleInput:
 # storing FP inputs in every other address of stack
@@ -134,8 +157,8 @@ handleInput:
 # setting the word following the address of each FP num to 0 if $fx == 0.0, 1 otherwise
 addiu $sp, $sp, -96         # make room for 24 numbers on stack
 li $v0, 6                   # read float
-li $t1, 1
-li.s $f25, 0.0
+li $t1, 1                   # $t1: 1
+li.s $f25, 0.0              # $f25: 0.0
 la $t2, 96                  # $t2: offset
 add $t0, $sp, $t2           # $t0: offset($sp-96)
 syscallLoop:
