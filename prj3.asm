@@ -31,13 +31,9 @@ jal handleInput
 # blt $t4, $t6, prepEq1forTwo2x2    # if # of 0's == 1
 # blt $t4, $t7, prepEq1forOne1x1    # if # of 0's == 2
 
-
 # need to check if equations have no solution
 # need to make regular checks to see if the elimination process eliminates more than one var
 # (more than 1 0 coef is created)
-
-# prepEq1forThree3x3:
-
 
 three3x3:
 # 3 - 3 var equations, assuming no 0's
@@ -46,13 +42,16 @@ three3x3:
 # eq3: f7x + f8y + f9z = f12
 
 li.s $f0, -1.0
+li.s $f25, 0.0
 # getting 1st equation ready to subtract from 2nd
+# lw $t0, 88($sp)             # $t0: 0/1 for f1
+# ble $t0, $zero, preTwo2x2   # skip if f1 == 0
 div.s $f13, $f4, $f1
-mul.s $f13, $f13 $f0    # $f13: const to mult with all coefs
-mul.s $f1, $f1, $f13    # $f1: a11 (ready to cancel out a21)
-mul.s $f2, $f2, $f13    # $f2: a12 (ready to subtract from a22)
-mul.s $f3, $f3, $f13    # $f3: a13 (ready to subract from a23)
-mul.s $f10, $f10, $f13  # $f10: b1 (ready to subtract from b2)
+mul.s $f13, $f13 $f0        # $f13: const to mult with all coefs
+mul.s $f1, $f1, $f13        # $f1: a11 (ready to cancel out a21)
+mul.s $f2, $f2, $f13        # $f2: a12 (ready to subtract from a22)
+mul.s $f3, $f3, $f13        # $f3: a13 (ready to subract from a23)
+mul.s $f10, $f10, $f13      # $f10: b1 (ready to subtract from b2)
 
 # $f4 + $f1 == 0
 add.s $f14, $f5, $f2   
@@ -74,8 +73,10 @@ add.s $f18, $f6, $f9
 add.s $f19, $f11, $f12  # f17y + f18z = f19
 # check for 0's in f17 and f18
 
-# prepEq1forTwo2x2:
-
+# firstEqfirst0:          # f1x + f2y + f3z = f10 where f1 = 0
+# add.s $f14, $f2, $f25   # $f14: f2
+# add.s $f15, $f3, $f25   # $f15: f3
+# add.s $f16, $f10, $f25  # $f16: f10
 
 two2x2:
 # 2 - 2 var equations, assuming no 0's
@@ -93,9 +94,6 @@ mul.s $f16, $f16, $f13  # $f16: ready to subtract from f19
 add.s $f20, $f15, $f18
 add.s $f21, $f16, $f19  # f20z = f21
 # check for 0 in f20
-
-# prepEq1forOne1x1:
-
 
 one1x1:
 # 1 - 1 var equation, assuming no 0's (solve for z then plug in for y and x)
