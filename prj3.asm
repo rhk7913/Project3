@@ -110,7 +110,7 @@ div.s $f23, $f23, $f14
 div.s $f24, $f24, $f14
 div.s $f25, $f25, $f14
 div.s $f26, $f26, $f14
-div.s $f27, $f28, $f14
+div.s $f27, $f27, $f14
 div.s $f28, $f28, $f14
 div.s $f29, $f29, $f14
 
@@ -165,9 +165,6 @@ la $a0, sol3
 syscall
 li $v0, 2
 add.s $f12, $f17, $f0   # load argument $f12 with $f17: z
-syscall
-li $v0, 4
-la $a0, newline
 syscall
 j exit
 
